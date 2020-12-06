@@ -21,79 +21,68 @@ import javax.swing.event.MenuListener;
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame {
-    // Начальные размеры окна приложения
     private static final int WIDTH = 800;
     private static final int HEIGHT = 600;
-    // Объект диалогового окна для выбора файлов
     private JFileChooser fileChooser = null;
-    // Пункты меню
     private JCheckBoxMenuItem showAxisMenuItem;
     private JCheckBoxMenuItem showMarkersMenuItem;
-    // Компонент-отображатель графика
+    private JCheckBoxMenuItem showTicksMenuItem;
     private GraphicsDisplay display = new GraphicsDisplay();
-    // Флаг, указывающий на загруженность данных графика
     private boolean fileLoaded = false;
     public MainFrame() {
-// Вызов конструктора предка Frame
         super("Построение графиков функций на основе заранее подготовленных файлов");
-// Установка размеров окна
-                setSize(WIDTH, HEIGHT);
+        setSize(WIDTH, HEIGHT);
         Toolkit kit = Toolkit.getDefaultToolkit();
-// Отцентрировать окно приложения на экране
-        setLocation((kit.getScreenSize().width - WIDTH)/2,
-                (kit.getScreenSize().height - HEIGHT)/2);
-// Развѐртывание окна на весь экран
+        setLocation((kit.getScreenSize().width - WIDTH)/2, (kit.getScreenSize().height - HEIGHT)/2);
         setExtendedState(MAXIMIZED_BOTH);
-// Создать и установить полосу меню
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
-// Добавить пункт меню "Файл"
         JMenu fileMenu = new JMenu("Файл");
         menuBar.add(fileMenu);
-// Создать действие по открытию файла
+
         Action openGraphicsAction = new AbstractAction("Открыть файл с графиком") {
         public void actionPerformed(ActionEvent event) {
             if (fileChooser==null) {
                 fileChooser = new JFileChooser();
                 fileChooser.setCurrentDirectory(new File("."));
             }
-            if (fileChooser.showOpenDialog(MainFrame.this) ==
-                    JFileChooser.APPROVE_OPTION)
+            if (fileChooser.showOpenDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
                 openGraphics(fileChooser.getSelectedFile());
-        }
-    };
-// Добавить соответствующий элемент меню
-fileMenu.add(openGraphicsAction);
-    // Создать пункт меню "График"
-    JMenu graphicsMenu = new JMenu("График");
-menuBar.add(graphicsMenu);
-    // Создать действие для реакции на активацию элемента "Показывать
-    Action showAxisAction = new AbstractAction("Показывать оси координат") {
-    public void actionPerformed(ActionEvent event) {
-// свойство showAxis класса GraphicsDisplay истина,
-// showAxisMenuItem отмечен флажком, и ложь - в
-        display.setShowAxis(showAxisMenuItem.isSelected());
-    }
-};
-showAxisMenuItem = new JCheckBoxMenuItem(showAxisAction);
-// Добавить соответствующий элемент в меню
+            }
+        };
+        fileMenu.add(openGraphicsAction);
+
+        JMenu graphicsMenu = new JMenu("График");
+        menuBar.add(graphicsMenu);
+
+        Action showAxisAction = new AbstractAction("Показывать оси координат") {
+            public void actionPerformed(ActionEvent event) {
+                display.setShowAxis(showAxisMenuItem.isSelected());
+            }
+        };
+        showAxisMenuItem = new JCheckBoxMenuItem(showAxisAction);
         graphicsMenu.add(showAxisMenuItem);
-// Элемент по умолчанию включен (отмечен флажком)
         showAxisMenuItem.setSelected(true);
-// Повторить действия для элемента "Показывать маркеры точек"
+
         Action showMarkersAction = new AbstractAction("Показывать маркеры точек") {
-public void actionPerformed(ActionEvent event) {
-// по аналогии с showAxisMenuItem
-        display.setShowMarkers(showMarkersMenuItem.isSelected());
-        }
+            public void actionPerformed(ActionEvent event) {
+                display.setShowMarkers(showMarkersMenuItem.isSelected());
+            }
         };
         showMarkersMenuItem = new JCheckBoxMenuItem(showMarkersAction);
         graphicsMenu.add(showMarkersMenuItem);
-// Элемент по умолчанию включен (отмечен флажком)
         showMarkersMenuItem.setSelected(true);
-// Зарегистрировать обработчик событий, связанных с меню "График"
+
+        Action showTicksAction = new AbstractAction("Показывать отметки на оси") {
+            public void actionPerformed(ActionEvent event) {
+                display.setShowTicks(showTicksMenuItem.isSelected());
+            }
+        };
+        showTicksMenuItem = new JCheckBoxMenuItem(showTicksAction);
+        graphicsMenu.add(showTicksMenuItem);
+        showTicksMenuItem.setSelected(true);
+
         graphicsMenu.addMenuListener(new GraphicsMenuListener());
-// Установить GraphicsDisplay в цент граничной компоновки
         getContentPane().add(display, BorderLayout.CENTER);
         }
 // Считывание данных графика из существующего файла
