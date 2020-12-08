@@ -26,6 +26,7 @@ public class GraphicsDisplay extends JPanel {
     private BasicStroke markerStroke;
     private BasicStroke ticksStroke;
     private Font axisFont;
+
     public GraphicsDisplay() {
         setBackground(Color.WHITE);
         graphicsStroke = new BasicStroke(2.0f, BasicStroke.CAP_BUTT,
@@ -38,6 +39,7 @@ public class GraphicsDisplay extends JPanel {
                 BasicStroke.JOIN_MITER, 10.0f, null, 0.0f);
         axisFont = new Font("Serif", Font.BOLD, 36);
     }
+
     public void showGraphics(Double[][] graphicsData) {
         this.graphicsData = graphicsData;
         repaint();
@@ -132,7 +134,7 @@ public class GraphicsDisplay extends JPanel {
             canvas.setColor(Color.RED);
         }
     }
-    // Метод, обеспечивающий отображение осей координат
+
     protected void paintAxis(Graphics2D canvas) {
         canvas.setStroke(axisStroke);
         canvas.setColor(Color.BLACK);
@@ -154,7 +156,7 @@ public class GraphicsDisplay extends JPanel {
             canvas.drawString("y", (float)labelPos.getX() + 10, (float)(labelPos.getY() - bounds.getY()));
         }
         if (minY<=0.0 && maxY>=0.0) {
-                    canvas.draw(new Line2D.Double(xyToPoint(minX, 0),
+            canvas.draw(new Line2D.Double(xyToPoint(minX, 0),
                             xyToPoint(maxX, 0)));
             GeneralPath arrow = new GeneralPath();
             Point2D.Double lineEnd = xyToPoint(maxX, 0);
@@ -181,11 +183,11 @@ public class GraphicsDisplay extends JPanel {
         double deltaY = (maxY - minY)/100;
 
         for(int i = 0; i < 100; i+=5){
-            canvas.draw(composeHorizontalTick(xyToPoint(minX + i*deltaX, 0), 1));
-            canvas.draw(composeHorizontalTick(xyToPoint(minX + (i + 1)*deltaX, 0), 1));
-            canvas.draw(composeHorizontalTick(xyToPoint(minX + (i + 2)*deltaX, 0), 1));
-            canvas.draw(composeHorizontalTick(xyToPoint(minX + (i + 3)*deltaX, 0), 1));
-            canvas.draw(composeHorizontalTick(xyToPoint(minX + (i + 4)*deltaX, 0), 2));
+            canvas.draw(composeVerticalTick(xyToPoint(minX + i*deltaX, 0), 1));
+            canvas.draw(composeVerticalTick(xyToPoint(minX + (i + 1)*deltaX, 0), 1));
+            canvas.draw(composeVerticalTick(xyToPoint(minX + (i + 2)*deltaX, 0), 1));
+            canvas.draw(composeVerticalTick(xyToPoint(minX + (i + 3)*deltaX, 0), 1));
+            canvas.draw(composeVerticalTick(xyToPoint(minX + (i + 4)*deltaX, 0), 2));
 
             canvas.draw(composeHorizontalTick(xyToPoint(0, minY + i*deltaX), 1));
             canvas.draw(composeHorizontalTick(xyToPoint(0, minY + (i + 1)*deltaX), 1));
