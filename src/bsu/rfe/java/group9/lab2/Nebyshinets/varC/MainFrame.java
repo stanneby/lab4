@@ -27,6 +27,7 @@ public class MainFrame extends JFrame {
     private JCheckBoxMenuItem showAxisMenuItem;
     private JCheckBoxMenuItem showMarkersMenuItem;
     private JCheckBoxMenuItem showTicksMenuItem;
+    private JCheckBoxMenuItem showRotatedMenuItem;
     private GraphicsDisplay display = new GraphicsDisplay();
     private boolean fileLoaded = false;
 
@@ -82,6 +83,15 @@ public class MainFrame extends JFrame {
         showTicksMenuItem = new JCheckBoxMenuItem(showTicksAction);
         graphicsMenu.add(showTicksMenuItem);
         showTicksMenuItem.setSelected(true);
+
+        Action showRotatedAction = new AbstractAction("Повернуть на 90 градусов влево") {
+            public void actionPerformed(ActionEvent event) {
+                display.setShowRotated(showRotatedMenuItem.isSelected());
+            }
+        };
+        showRotatedMenuItem = new JCheckBoxMenuItem(showRotatedAction);
+        graphicsMenu.add(showRotatedMenuItem);
+        showRotatedMenuItem.setSelected(false);
 
         graphicsMenu.addMenuListener(new GraphicsMenuListener());
         getContentPane().add(display, BorderLayout.CENTER);

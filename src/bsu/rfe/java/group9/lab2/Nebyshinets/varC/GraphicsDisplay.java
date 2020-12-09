@@ -16,6 +16,7 @@ public class GraphicsDisplay extends JPanel {
     private boolean showAxis = true;
     private boolean showMarkers = true;
     private boolean showTicks = true;
+    private boolean showRotated = false;
     private double minX;
     private double maxX;
     private double minY;
@@ -57,6 +58,10 @@ public class GraphicsDisplay extends JPanel {
         this.showTicks = showTicks;
         repaint();
     }
+    public void setShowRotated(boolean showRotated) {
+        this.showRotated = showRotated;
+        repaint();
+    }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -73,20 +78,38 @@ public class GraphicsDisplay extends JPanel {
                 maxY = graphicsData[i][1];
             }
         }
+
         double scaleX = getSize().getWidth() / (maxX - minX);
         double scaleY = getSize().getHeight() / (maxY - minY);
+
         scale = Math.min(scaleX, scaleY);
-        if (scale==scaleX) {
-            double yIncrement = (getSize().getHeight()/scale - (maxY -
-                    minY))/2;
-            maxY += yIncrement;
-            minY -= yIncrement;
-        }
-        if (scale==scaleY) {
-            double xIncrement = (getSize().getWidth()/scale - (maxX -
-                    minX))/2;
-            maxX += xIncrement;
-            minX -= xIncrement;
+
+        if(!showRotated) {
+            if (scale == scaleX) {
+                double yIncrement = (getSize().getHeight() / scale - (maxY -
+                        minY)) / 2;
+                maxY += yIncrement;
+                minY -= yIncrement;
+            }
+            if (scale == scaleY) {
+                double xIncrement = (getSize().getWidth() / scale - (maxX -
+                        minX)) / 2;
+                maxX += xIncrement;
+                minX -= xIncrement;
+            }
+        } else {
+            if (scale == scaleX) {
+                double yIncrement = (getSize().getWidth() / scale - (maxY -
+                        minY)) / 2;
+                maxY += yIncrement;
+                minY -= yIncrement;
+            }
+            if (scale == scaleY) {
+                double xIncrement = (getSize().getHeight() / scale - (maxX -
+                        minX)) / 2;
+                maxX += xIncrement;
+                minX -= xIncrement;
+            }
         }
         Graphics2D canvas = (Graphics2D) g;
         Stroke oldStroke = canvas.getStroke();
@@ -145,10 +168,17 @@ public class GraphicsDisplay extends JPanel {
             canvas.draw(new Line2D.Double(xyToPoint(0, maxY), xyToPoint(0, minY)));
             GeneralPath arrow = new GeneralPath();
             Point2D.Double lineEnd = xyToPoint(0, maxY);
-            arrow.moveTo(lineEnd.getX(), lineEnd.getY());
-            arrow.lineTo(arrow.getCurrentPoint().getX()+5, arrow.getCurrentPoint().getY()+20);
-            arrow.lineTo(arrow.getCurrentPoint().getX()-10, arrow.getCurrentPoint().getY());
-            arrow.closePath();
+            if(!showRotated) {
+                arrow.moveTo(lineEnd.getX(), lineEnd.getY());
+                arrow.lineTo(arrow.getCurrentPoint().getX() + 5, arrow.getCurrentPoint().getY() + 20);
+                arrow.lineTo(arrow.getCurrentPoint().getX() - 10, arrow.getCurrentPoint().getY());
+                arrow.closePath();
+            } else {
+                arrow.moveTo(lineEnd.getX(), lineEnd.getY());
+                arrow.lineTo(arrow.getCurrentPoint().getX()-20, arrow.getCurrentPoint().getY()-5);
+                arrow.lineTo(arrow.getCurrentPoint().getX(), arrow.getCurrentPoint().getY()+10);
+                arrow.closePath();
+            }
             canvas.draw(arrow);
             canvas.fill(arrow);
             Rectangle2D bounds = axisFont.getStringBounds("y", context);
@@ -160,10 +190,17 @@ public class GraphicsDisplay extends JPanel {
                             xyToPoint(maxX, 0)));
             GeneralPath arrow = new GeneralPath();
             Point2D.Double lineEnd = xyToPoint(maxX, 0);
-            arrow.moveTo(lineEnd.getX(), lineEnd.getY());
-            arrow.lineTo(arrow.getCurrentPoint().getX()-20, arrow.getCurrentPoint().getY()-5);
-            arrow.lineTo(arrow.getCurrentPoint().getX(), arrow.getCurrentPoint().getY()+10);
-            arrow.closePath();
+            if(!showRotated) {
+                arrow.moveTo(lineEnd.getX(), lineEnd.getY());
+                arrow.lineTo(arrow.getCurrentPoint().getX() - 20, arrow.getCurrentPoint().getY() - 5);
+                arrow.lineTo(arrow.getCurrentPoint().getX(), arrow.getCurrentPoint().getY() + 10);
+                arrow.closePath();
+            } else {
+                arrow.moveTo(lineEnd.getX(), lineEnd.getY());
+                arrow.lineTo(arrow.getCurrentPoint().getX() + 5, arrow.getCurrentPoint().getY() + 20);
+                arrow.lineTo(arrow.getCurrentPoint().getX() - 10, arrow.getCurrentPoint().getY());
+                arrow.closePath();
+            }
             canvas.draw(arrow);
             canvas.fill(arrow);
             Rectangle2D bounds = axisFont.getStringBounds("x", context);
@@ -182,25 +219,47 @@ public class GraphicsDisplay extends JPanel {
         double deltaX = (maxX - minX)/100;
         double deltaY = (maxY - minY)/100;
 
-        for(int i = 0; i < 100; i+=5){
-            canvas.draw(composeVerticalTick(xyToPoint(minX + i*deltaX, 0), 1));
-            canvas.draw(composeVerticalTick(xyToPoint(minX + (i + 1)*deltaX, 0), 1));
-            canvas.draw(composeVerticalTick(xyToPoint(minX + (i + 2)*deltaX, 0), 1));
-            canvas.draw(composeVerticalTick(xyToPoint(minX + (i + 3)*deltaX, 0), 1));
-            canvas.draw(composeVerticalTick(xyToPoint(minX + (i + 4)*deltaX, 0), 2));
+        if(!showRotated) {
+            for (int i = 0; i < 100; i += 5) {
+                canvas.draw(composeVerticalTick(xyToPoint(minX + i * deltaX, 0), 1));
+                canvas.draw(composeVerticalTick(xyToPoint(minX + (i + 1) * deltaX, 0), 1));
+                canvas.draw(composeVerticalTick(xyToPoint(minX + (i + 2) * deltaX, 0), 1));
+                canvas.draw(composeVerticalTick(xyToPoint(minX + (i + 3) * deltaX, 0), 1));
+                canvas.draw(composeVerticalTick(xyToPoint(minX + (i + 4) * deltaX, 0), 2));
 
-            canvas.draw(composeHorizontalTick(xyToPoint(0, minY + i*deltaX), 1));
-            canvas.draw(composeHorizontalTick(xyToPoint(0, minY + (i + 1)*deltaX), 1));
-            canvas.draw(composeHorizontalTick(xyToPoint(0, minY + (i + 2)*deltaX), 1));
-            canvas.draw(composeHorizontalTick(xyToPoint(0, minY + (i + 3)*deltaX), 1));
-            canvas.draw(composeHorizontalTick(xyToPoint(0, minY + (i + 4)*deltaX), 2));
+                canvas.draw(composeHorizontalTick(xyToPoint(0, minY + i * deltaX), 1));
+                canvas.draw(composeHorizontalTick(xyToPoint(0, minY + (i + 1) * deltaY), 1));
+                canvas.draw(composeHorizontalTick(xyToPoint(0, minY + (i + 2) * deltaY), 1));
+                canvas.draw(composeHorizontalTick(xyToPoint(0, minY + (i + 3) * deltaY), 1));
+                canvas.draw(composeHorizontalTick(xyToPoint(0, minY + (i + 4) * deltaY), 2));
+            }
+        } else {
+            for (int i = 0; i < 100; i += 5) {
+                canvas.draw(composeHorizontalTick(xyToPoint(minX + i * deltaX, 0), 1));
+                canvas.draw(composeHorizontalTick(xyToPoint(minX + (i + 1) * deltaX, 0), 1));
+                canvas.draw(composeHorizontalTick(xyToPoint(minX + (i + 2) * deltaX, 0), 1));
+                canvas.draw(composeHorizontalTick(xyToPoint(minX + (i + 3) * deltaX, 0), 1));
+                canvas.draw(composeHorizontalTick(xyToPoint(minX + (i + 4) * deltaX, 0), 2));
+
+                canvas.draw(composeVerticalTick(xyToPoint(0, minY + i * deltaX), 1));
+                canvas.draw(composeVerticalTick(xyToPoint(0, minY + (i + 1) * deltaY), 1));
+                canvas.draw(composeVerticalTick(xyToPoint(0, minY + (i + 2) * deltaY), 1));
+                canvas.draw(composeVerticalTick(xyToPoint(0, minY + (i + 3) * deltaY), 1));
+                canvas.draw(composeVerticalTick(xyToPoint(0, minY + (i + 4) * deltaY), 2));
+            }
         }
     }
 
     protected Point2D.Double xyToPoint(double x, double y) {
-        double deltaX = x - minX;
-        double deltaY = maxY - y;
-        return new Point2D.Double(deltaX*scale, deltaY*scale);
+        if(showRotated) {
+            double deltaX = maxX - x;
+            double deltaY = maxY - y;
+            return new Point2D.Double(deltaY * scale, deltaX * scale);
+        } else {
+            double deltaX = x - minX;
+            double deltaY = maxY - y;
+            return new Point2D.Double(deltaX * scale, deltaY * scale);
+        }
     }
 
     protected Point2D.Double shiftPoint(Point2D.Double src, double deltaX,
@@ -218,12 +277,16 @@ public class GraphicsDisplay extends JPanel {
         double y_0 = point2d.getY();
 
         marker.moveTo(x_0 - 5, y_0 - 5);
-        marker.lineTo(x_0 - 5, y_0 + 5);
-        marker.lineTo(x_0 + 5, y_0 + 5);
+        marker.lineTo(x_0, y_0 + 5);
         marker.lineTo(x_0 + 5, y_0 - 5);
+        marker.lineTo(x_0 - 5, y_0 - 5);
+
+        /*
         marker.lineTo(x_0 - 5, y_0 - 5);
         marker.append(new Line2D.Double(x_0 - 5, y_0 - 5, x_0 + 5, y_0 + 5), true);
         marker.append(new Line2D.Double(x_0 - 5, y_0 + 5, x_0 + 5, y_0 - 5), true);
+
+         */
 
         return marker;
     };
